@@ -210,6 +210,8 @@ const openrouter = createOpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
@@ -219,7 +221,7 @@ export async function POST(req: Request) {
     model: openrouter(modelId),
     system: systemPrompt,
     messages,
-    maxTokens: 1024,
+    maxTokens: 512,
   });
 
   return result.toDataStreamResponse();
