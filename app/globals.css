@@ -1,14 +1,22 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
 
 :root {
-  --color-warm-50: #fdf8f6;
-  --color-warm-100: #f9ede7;
-  --color-warm-200: #f3ddd3;
-  --color-warm-500: #d4856a;
-  --color-warm-600: #c06a4d;
-  --color-warm-700: #a05538;
-  --color-warm-800: #6b3a27;
-  --color-warm-900: #3d2118;
+  --color-teal: #1c9690;
+  --color-teal-dark: #167a75;
+  --color-teal-light: #e6f5f4;
+  --color-orange: #F89528;
+  --color-orange-dark: #d15a00;
+  --color-heading: #1D2939;
+  --color-body: #475467;
+  --color-bg: #f7f7f7;
+  --color-white: #ffffff;
+  --color-border: #e5e7eb;
+  --color-footer: #3d4045;
+}
+
+* {
+  font-family: 'Varela Round', sans-serif;
 }
 
 html,
@@ -25,7 +33,7 @@ body {
   background: transparent;
 }
 .chat-scroll::-webkit-scrollbar-thumb {
-  background-color: #d4856a40;
+  background-color: #1c969040;
   border-radius: 3px;
 }
 

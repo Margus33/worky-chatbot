@@ -47,18 +47,18 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-dvh flex-col bg-[var(--color-bg)]">
       {/* Header */}
-      <header className="flex items-center gap-3 border-b border-[var(--color-warm-200)] bg-white/80 px-4 py-3 backdrop-blur-sm">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-warm-500)] text-sm font-bold text-white">
+      <header className="flex items-center gap-3 border-b border-[var(--color-border)] bg-white px-4 py-3 shadow-sm">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-teal)] text-sm font-bold text-white">
           W
         </div>
         <div>
-          <h1 className="text-base font-semibold leading-tight text-[var(--color-warm-800)]">
+          <h1 className="text-base font-semibold leading-tight text-[var(--color-heading)]">
             Worky
           </h1>
-          <p className="text-xs text-[var(--color-warm-500)]">
-            Coach Personal Branding
+          <p className="text-xs text-[var(--color-body)]">
+            Coach Personal Branding — Workengo.it
           </p>
         </div>
       </header>
@@ -74,14 +74,14 @@ export default function Chat() {
               key={m.id}
               className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
             >
-              <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--color-warm-500)]">
+              <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--color-body)]">
                 {m.role === "user" ? "Tu" : "Worky"}
               </span>
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap ${
                   m.role === "user"
-                    ? "rounded-br-md bg-[var(--color-warm-600)] text-white"
-                    : "rounded-bl-md bg-white text-[var(--color-warm-900)] shadow-sm ring-1 ring-[var(--color-warm-200)]"
+                    ? "rounded-br-md bg-[var(--color-teal)] text-white"
+                    : "rounded-bl-md bg-white text-[var(--color-heading)] shadow-sm ring-1 ring-[var(--color-border)]"
                 }`}
               >
                 {m.content}
@@ -93,13 +93,13 @@ export default function Chat() {
           {isLoading &&
             messages[messages.length - 1]?.role === "user" && (
               <div className="flex flex-col items-start">
-                <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--color-warm-500)]">
+                <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--color-body)]">
                   Worky
                 </span>
-                <div className="flex gap-1 rounded-2xl rounded-bl-md bg-white px-4 py-3 shadow-sm ring-1 ring-[var(--color-warm-200)]">
-                  <span className="typing-dot h-2 w-2 rounded-full bg-[var(--color-warm-500)]" />
-                  <span className="typing-dot h-2 w-2 rounded-full bg-[var(--color-warm-500)]" />
-                  <span className="typing-dot h-2 w-2 rounded-full bg-[var(--color-warm-500)]" />
+                <div className="flex gap-1 rounded-2xl rounded-bl-md bg-white px-4 py-3 shadow-sm ring-1 ring-[var(--color-border)]">
+                  <span className="typing-dot h-2 w-2 rounded-full bg-[var(--color-teal)]" />
+                  <span className="typing-dot h-2 w-2 rounded-full bg-[var(--color-teal)]" />
+                  <span className="typing-dot h-2 w-2 rounded-full bg-[var(--color-teal)]" />
                 </div>
               </div>
             )}
@@ -114,7 +114,7 @@ export default function Chat() {
       )}
 
       {/* Input */}
-      <div className="border-t border-[var(--color-warm-200)] bg-white/80 px-4 py-3 backdrop-blur-sm">
+      <div className="border-t border-[var(--color-border)] bg-white px-4 py-3">
         <form
           onSubmit={onSubmit}
           className="mx-auto flex max-w-2xl items-end gap-2"
@@ -126,7 +126,7 @@ export default function Chat() {
             onKeyDown={handleKeyDown}
             placeholder="Scrivi un messaggio..."
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-[var(--color-warm-200)] bg-[var(--color-warm-50)] px-4 py-2.5 text-[15px] placeholder-[var(--color-warm-500)]/50 outline-none transition-colors focus:border-[var(--color-warm-500)] focus:ring-1 focus:ring-[var(--color-warm-500)]"
+            className="flex-1 resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-2.5 text-[15px] text-[var(--color-heading)] placeholder-[var(--color-body)]/50 outline-none transition-colors focus:border-[var(--color-teal)] focus:ring-1 focus:ring-[var(--color-teal)]"
             style={{ maxHeight: "120px" }}
             onInput={(e) => {
               const target = e.target as HTMLTextAreaElement;
@@ -137,7 +137,7 @@ export default function Chat() {
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-warm-600)] text-white transition-colors hover:bg-[var(--color-warm-700)] disabled:opacity-40 disabled:hover:bg-[var(--color-warm-600)]"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-orange)] text-white transition-colors hover:bg-[var(--color-orange-dark)] disabled:opacity-40 disabled:hover:bg-[var(--color-orange)]"
             aria-label="Invia messaggio"
           >
             <svg
@@ -150,13 +150,13 @@ export default function Chat() {
             </svg>
           </button>
         </form>
-        <p className="mx-auto mt-2 max-w-2xl text-center text-[11px] text-[var(--color-warm-500)]/60">
+        <p className="mx-auto mt-2 max-w-2xl text-center text-[11px] text-[var(--color-body)]/60">
           Worky di{" "}
           <a
             href="https://workengo.it"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline"
+            className="underline hover:text-[var(--color-teal)]"
           >
             Workengo.it
           </a>{" "}
