@@ -273,7 +273,7 @@ export async function POST(req: Request) {
       model: openrouter(modelId),
       system: systemPrompt,
       messages,
-      maxTokens: 512,
+      maxTokens: 1500,
     });
 
     return result.toDataStreamResponse();
