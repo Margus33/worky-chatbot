@@ -48,15 +48,26 @@ function parseAchievements(text: string): { cleaned: string; achievements: Achie
   return { cleaned: cleaned.trim(), achievements };
 }
 
-function AchievementCard({ achievement }: { achievement: Achievement }) {
+function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(achievement.content);
+    navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [achievement.content]);
+  }, [text]);
 
+  return (
+    <button
+      onClick={handleCopy}
+      className="rounded-lg bg-white px-3 py-1 text-xs font-medium text-[var(--color-teal-dark)] shadow-sm ring-1 ring-[var(--color-teal)]/30 transition-all hover:bg-[var(--color-teal)] hover:text-white shrink-0"
+    >
+      {copied ? "Copiato! ✓" : "Copia"}
+    </button>
+  );
+}
+
+function AchievementCard({ achievement }: { achievement: Achievement }) {
   return (
     <div className="mt-2 rounded-xl border-2 border-[var(--color-teal)] bg-[var(--color-teal-light)] p-3">
       <div className="flex items-center justify-between">
@@ -68,17 +79,101 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
             {achievement.emoji} {achievement.label}
           </span>
         </div>
-        <button
-          onClick={handleCopy}
-          className="rounded-lg bg-white px-3 py-1 text-xs font-medium text-[var(--color-teal-dark)] shadow-sm ring-1 ring-[var(--color-teal)]/30 transition-all hover:bg-[var(--color-teal)] hover:text-white"
-        >
-          {copied ? "Copiato! ✓" : "Copia"}
-        </button>
+        <CopyButton text={achievement.content} />
       </div>
       <p className="mt-2 text-sm leading-relaxed text-[var(--color-heading)] whitespace-pre-wrap">
         {achievement.content}
       </p>
     </div>
+  );
+}
+
+function SidePanel({
+  achievements,
+  open,
+  onClose,
+}: {
+  achievements: Achievement[];
+  open: boolean;
+  onClose: () => void;
+}) {
+  if (!open) return null;
+
+  // Group by tag, keep last version of each
+  const grouped = new Map<string, Achievement>();
+  for (const a of achievements) {
+    grouped.set(a.tag, a);
+  }
+  const unique = Array.from(grouped.values());
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      {/* Panel */}
+      <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-sm flex-col bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
+          <h2 className="text-base font-semibold text-[var(--color-heading)]">
+            I tuoi risultati ({unique.length})
+          </h2>
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--color-body)] hover:bg-[var(--color-bg)]"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          {unique.length === 0 ? (
+            <p className="text-center text-sm text-[var(--color-body)]">
+              Nessun risultato ancora. Continua a chattare con Worky!
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {unique.map((a) => (
+                <div
+                  key={a.tag}
+                  className="rounded-xl border border-[var(--color-teal)] bg-[var(--color-teal-light)] p-3"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-teal)] text-xs text-white">
+                        ✓
+                      </span>
+                      <span className="text-sm font-semibold text-[var(--color-teal-dark)]">
+                        {a.emoji} {a.label}
+                      </span>
+                    </div>
+                    <CopyButton text={a.content} />
+                  </div>
+                  <p className="text-sm leading-relaxed text-[var(--color-heading)] whitespace-pre-wrap">
+                    {a.content}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {unique.length > 0 && (
+          <div className="border-t border-[var(--color-border)] p-4">
+            <button
+              onClick={() => {
+                const text = unique
+                  .map((a) => `${a.emoji} ${a.label}:\n${a.content}`)
+                  .join("\n\n---\n\n");
+                navigator.clipboard.writeText(text);
+              }}
+              className="w-full rounded-xl bg-[var(--color-teal)] py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-teal-dark)]"
+            >
+              Copia tutto
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -109,6 +204,7 @@ export default function Chat() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -142,6 +238,13 @@ export default function Chat() {
     }
   }
 
+  // Count unique (latest version of each tag)
+  const uniqueMap = new Map<string, Achievement>();
+  for (const a of allAchievements) {
+    uniqueMap.set(a.tag, a);
+  }
+  const uniqueCount = uniqueMap.size;
+
   return (
     <div className="flex h-dvh flex-col bg-[var(--color-bg)]">
       {/* Header */}
@@ -160,13 +263,26 @@ export default function Chat() {
           </div>
         </div>
         {allAchievements.length > 0 && (
-          <div className="flex items-center gap-1 rounded-full bg-[var(--color-teal-light)] px-3 py-1">
-            <span className="text-xs font-semibold text-[var(--color-teal-dark)]">
-              {allAchievements.length} risultati
+          <button
+            onClick={() => setPanelOpen(true)}
+            className="flex items-center gap-1.5 rounded-full bg-[var(--color-teal-light)] px-3 py-1.5 transition-colors hover:bg-[var(--color-teal)]/20"
+          >
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-teal)] text-[10px] text-white">
+              ✓
             </span>
-          </div>
+            <span className="text-xs font-semibold text-[var(--color-teal-dark)]">
+              {uniqueCount} risultati
+            </span>
+          </button>
         )}
       </header>
+
+      {/* Side Panel */}
+      <SidePanel
+        achievements={allAchievements}
+        open={panelOpen}
+        onClose={() => setPanelOpen(false)}
+      />
 
       {/* Messages */}
       <div
