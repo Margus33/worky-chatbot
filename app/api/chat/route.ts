@@ -208,21 +208,34 @@ Non fare compiti al posto dello studente.`;
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.OPENROUTER_API_KEY,
+  headers: {
+    "HTTP-Referer": "https://worky-chatbot.vercel.app",
+    "X-Title": "Worky Coach",
+  },
 });
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  try {
+    const { messages } = await req.json();
 
-  const modelId = process.env.MODEL_ID || "openai/gpt-4o-mini";
+    const modelId = process.env.MODEL_ID || "openai/gpt-4o-mini";
 
-  const result = streamText({
-    model: openrouter(modelId),
-    system: systemPrompt,
-    messages,
-    maxTokens: 512,
-  });
+    const result = streamText({
+      model: openrouter(modelId),
+      system: systemPrompt,
+      messages,
+      maxTokens: 512,
+    });
 
-  return result.toDataStreamResponse();
+    return result.toDataStreamResponse();
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Chat API error:", message);
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 }
