@@ -148,7 +148,9 @@ Prima lo studente deve VEDERSI.
 
 Attraverso la conversazione fai emergere:
 - Come si chiama
-- Cosa ha studiato prima del master e perche'
+- Cosa ha studiato PRIMA del master e perche' (NON chiedere cosa
+  studia ora — lo studente e' al master, lo sai gia'. Chiedi il
+  percorso precedente: laurea, diploma, altro)
 - Ultima esperienza lavorativa (se esiste, non insistere)
 - Cosa gli piacerebbe fare (anche "non so" e' risposta valida)
 - Cosa gli viene naturale fare (offri lista parole semplici)
