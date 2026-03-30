@@ -20,6 +20,8 @@ const TAG_CONFIG: Record<string, { label: string; emoji: string }> = {
   CALENDARIO: { label: "Calendario editoriale", emoji: "📅" },
 };
 
+const TOTAL_DISCOVERIES = Object.keys(TAG_CONFIG).length;
+
 interface Achievement {
   tag: string;
   label: string;
@@ -67,16 +69,16 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-function AchievementCard({ achievement }: { achievement: Achievement }) {
+function AchievementCard({ achievement, discoveryNumber }: { achievement: Achievement; discoveryNumber: number }) {
   return (
-    <div className="mt-2 rounded-xl border-2 border-[var(--color-teal)] bg-[var(--color-teal-light)] p-3">
+    <div className="mt-2 rounded-xl border-2 border-[var(--color-orange)]/40 bg-gradient-to-r from-[var(--color-teal-light)] to-orange-50 p-3 star-glow">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-teal)] text-xs text-white">
-            ✓
+          <span className="star-pop flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-orange)] to-yellow-400 text-sm text-white font-bold shadow-md">
+            ⭐
           </span>
-          <span className="text-sm font-semibold text-[var(--color-teal-dark)]">
-            {achievement.emoji} {achievement.label}
+          <span className="text-sm font-semibold text-[var(--color-heading)]">
+            Scoperta {discoveryNumber} — {achievement.emoji} {achievement.label}
           </span>
         </div>
         <CopyButton text={achievement.content} />
@@ -99,7 +101,6 @@ function SidePanel({
 }) {
   if (!open) return null;
 
-  // Group by tag, keep last version of each
   const grouped = new Map<string, Achievement>();
   for (const a of achievements) {
     grouped.set(a.tag, a);
@@ -108,16 +109,14 @@ function SidePanel({
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
       />
-      {/* Panel */}
       <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-sm flex-col bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
           <h2 className="text-base font-semibold text-[var(--color-heading)]">
-            I tuoi risultati ({unique.length})
+            ⭐ Le tue scoperte ({unique.length}/{TOTAL_DISCOVERIES})
           </h2>
           <button
             onClick={onClose}
@@ -129,21 +128,21 @@ function SidePanel({
         <div className="flex-1 overflow-y-auto p-4">
           {unique.length === 0 ? (
             <p className="text-center text-sm text-[var(--color-body)]">
-              Nessun risultato ancora. Continua a chattare con Worky!
+              Nessuna scoperta ancora. Continua a chattare con Worky!
             </p>
           ) : (
             <div className="flex flex-col gap-3">
-              {unique.map((a) => (
+              {unique.map((a, i) => (
                 <div
                   key={a.tag}
-                  className="rounded-xl border border-[var(--color-teal)] bg-[var(--color-teal-light)] p-3"
+                  className="rounded-xl border border-[var(--color-orange)]/30 bg-gradient-to-r from-[var(--color-teal-light)] to-orange-50 p-3"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-teal)] text-xs text-white">
-                        ✓
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-orange)] to-yellow-400 text-sm text-white font-bold shadow-sm">
+                        {i + 1}
                       </span>
-                      <span className="text-sm font-semibold text-[var(--color-teal-dark)]">
+                      <span className="text-sm font-semibold text-[var(--color-heading)]">
                         {a.emoji} {a.label}
                       </span>
                     </div>
@@ -162,13 +161,13 @@ function SidePanel({
             <button
               onClick={() => {
                 const text = unique
-                  .map((a) => `${a.emoji} ${a.label}:\n${a.content}`)
+                  .map((a, i) => `⭐ Scoperta ${i + 1} — ${a.emoji} ${a.label}:\n${a.content}`)
                   .join("\n\n---\n\n");
                 navigator.clipboard.writeText(text);
               }}
               className="w-full rounded-xl bg-[var(--color-teal)] py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-teal-dark)]"
             >
-              Copia tutto
+              Copia tutte le scoperte
             </button>
           </div>
         )}
@@ -177,50 +176,72 @@ function SidePanel({
   );
 }
 
-function MessageContent({ content }: { content: string }) {
+function MessageContent({ content, discoveryOffset }: { content: string; discoveryOffset: number }) {
   const { cleaned, achievements } = parseAchievements(content);
 
   return (
     <>
       {cleaned && <span>{cleaned}</span>}
       {achievements.map((a, i) => (
-        <AchievementCard key={`${a.tag}-${i}`} achievement={a} />
+        <AchievementCard key={`${a.tag}-${i}`} achievement={a} discoveryNumber={discoveryOffset + i + 1} />
       ))}
     </>
   );
 }
 
-function loadSavedMessages() {
-  if (typeof window === "undefined") return null;
-  try {
-    const saved = localStorage.getItem("worky-messages");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch {}
-  return null;
-}
+const WELCOME_MESSAGES = [
+  {
+    id: "welcome",
+    role: "assistant" as const,
+    content: WELCOME_MESSAGE,
+  },
+];
 
 export default function Chat() {
-  const saved = useRef(loadSavedMessages());
+  const [mounted, setMounted] = useState(false);
+  const [savedMessages, setSavedMessages] = useState<typeof WELCOME_MESSAGES | null>(null);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("worky-messages");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setSavedMessages(parsed);
+        }
+      }
+    } catch {}
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex h-dvh items-center justify-center bg-[var(--color-bg)]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-teal)] text-lg font-bold text-white">
+            W
+          </div>
+          <p className="text-sm text-[var(--color-body)]">Caricamento...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <ChatInner initialMessages={savedMessages || WELCOME_MESSAGES} />;
+}
+
+function ChatInner({ initialMessages }: { initialMessages: Array<{ id: string; role: "assistant" | "user"; content: string }> }) {
   const { messages, input, handleInputChange, handleSubmit, isLoading, error, setMessages } =
     useChat({
-      initialMessages: saved.current || [
-        {
-          id: "welcome",
-          role: "assistant",
-          content: WELCOME_MESSAGE,
-        },
-      ],
+      initialMessages,
     });
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  const prevCountRef = useRef(0);
+  const [pulseCounter, setPulseCounter] = useState(false);
 
-  // Save messages to localStorage
   useEffect(() => {
     if (messages.length > 1) {
       localStorage.setItem("worky-messages", JSON.stringify(messages));
@@ -239,14 +260,9 @@ export default function Chat() {
 
   const handleReset = useCallback(() => {
     localStorage.removeItem("worky-messages");
-    setMessages([
-      {
-        id: "welcome",
-        role: "assistant",
-        content: WELCOME_MESSAGE,
-      },
-    ]);
+    setMessages(WELCOME_MESSAGES);
     setPanelOpen(false);
+    prevCountRef.current = 0;
   }, [setMessages]);
 
   const onSubmit = (e: React.FormEvent) => {
@@ -262,21 +278,34 @@ export default function Chat() {
     }
   };
 
-  // Collect all achievements from all messages
+  // Collect all achievements and track discovery numbers
   const allAchievements: Achievement[] = [];
+  const discoveryOffsets: Map<string, number> = new Map();
+
   for (const m of messages) {
     if (m.role === "assistant") {
+      const offset = allAchievements.length;
       const { achievements } = parseAchievements(m.content);
+      discoveryOffsets.set(m.id, offset);
       allAchievements.push(...achievements);
     }
   }
 
-  // Count unique (latest version of each tag)
   const uniqueMap = new Map<string, Achievement>();
   for (const a of allAchievements) {
     uniqueMap.set(a.tag, a);
   }
   const uniqueCount = uniqueMap.size;
+
+  // Pulse animation when new discovery arrives
+  useEffect(() => {
+    if (uniqueCount > prevCountRef.current) {
+      setPulseCounter(true);
+      const timer = setTimeout(() => setPulseCounter(false), 500);
+      prevCountRef.current = uniqueCount;
+      return () => clearTimeout(timer);
+    }
+  }, [uniqueCount]);
 
   return (
     <div className="flex h-dvh flex-col bg-[var(--color-bg)]">
@@ -304,19 +333,19 @@ export default function Chat() {
               Ricomincia
             </button>
           )}
-          {allAchievements.length > 0 && (
-            <button
-              onClick={() => setPanelOpen(true)}
-              className="flex items-center gap-1.5 rounded-full bg-[var(--color-teal-light)] px-3 py-1.5 transition-colors hover:bg-[var(--color-teal)]/20"
-            >
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-teal)] text-[10px] text-white">
-                ✓
-              </span>
-              <span className="text-xs font-semibold text-[var(--color-teal-dark)]">
-                {uniqueCount} risultati
-              </span>
-            </button>
-          )}
+          <button
+            onClick={() => setPanelOpen(true)}
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-all ${
+              uniqueCount > 0
+                ? "bg-gradient-to-r from-orange-50 to-yellow-50 ring-1 ring-[var(--color-orange)]/30 hover:ring-[var(--color-orange)]/60"
+                : "bg-[var(--color-bg)] ring-1 ring-[var(--color-border)]"
+            } ${pulseCounter ? "counter-pulse" : ""}`}
+          >
+            <span className="text-sm">⭐</span>
+            <span className={`text-xs font-semibold ${uniqueCount > 0 ? "text-[var(--color-orange-dark)]" : "text-[var(--color-body)]"}`}>
+              {uniqueCount}/{TOTAL_DISCOVERIES} scoperte
+            </span>
+          </button>
         </div>
       </header>
 
@@ -333,29 +362,32 @@ export default function Chat() {
         className="chat-scroll flex-1 overflow-y-auto px-4 py-4"
       >
         <div className="mx-auto flex max-w-2xl flex-col gap-4">
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
-            >
-              <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--color-body)]">
-                {m.role === "user" ? "Tu" : "Worky"}
-              </span>
+          {messages.map((m) => {
+            const offset = discoveryOffsets.get(m.id) ?? 0;
+            return (
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed ${
-                  m.role === "user"
-                    ? "rounded-br-md bg-[var(--color-teal)] text-white whitespace-pre-wrap"
-                    : "rounded-bl-md bg-white text-[var(--color-heading)] shadow-sm ring-1 ring-[var(--color-border)]"
-                }`}
+                key={m.id}
+                className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
               >
-                {m.role === "assistant" ? (
-                  <MessageContent content={m.content} />
-                ) : (
-                  m.content
-                )}
+                <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--color-body)]">
+                  {m.role === "user" ? "Tu" : "Worky"}
+                </span>
+                <div
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed ${
+                    m.role === "user"
+                      ? "rounded-br-md bg-[var(--color-teal)] text-white whitespace-pre-wrap"
+                      : "rounded-bl-md bg-white text-[var(--color-heading)] shadow-sm ring-1 ring-[var(--color-border)]"
+                  }`}
+                >
+                  {m.role === "assistant" ? (
+                    <MessageContent content={m.content} discoveryOffset={offset} />
+                  ) : (
+                    m.content
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Typing indicator */}
           {isLoading &&
@@ -389,6 +421,7 @@ export default function Chat() {
         >
           <textarea
             ref={inputRef}
+            id="message-input"
             name="message"
             value={input}
             onChange={handleInputChange}
