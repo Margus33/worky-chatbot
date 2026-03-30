@@ -190,10 +190,24 @@ function MessageContent({ content }: { content: string }) {
   );
 }
 
+function loadSavedMessages() {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = localStorage.getItem("worky-messages");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return null;
+}
+
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
+  const saved = useRef(loadSavedMessages());
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error, setMessages } =
     useChat({
-      initialMessages: [
+      initialMessages: saved.current || [
         {
           id: "welcome",
           role: "assistant",
@@ -206,6 +220,13 @@ export default function Chat() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [panelOpen, setPanelOpen] = useState(false);
 
+  // Save messages to localStorage
+  useEffect(() => {
+    if (messages.length > 1) {
+      localStorage.setItem("worky-messages", JSON.stringify(messages));
+    }
+  }, [messages]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -215,6 +236,18 @@ export default function Chat() {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  const handleReset = useCallback(() => {
+    localStorage.removeItem("worky-messages");
+    setMessages([
+      {
+        id: "welcome",
+        role: "assistant",
+        content: WELCOME_MESSAGE,
+      },
+    ]);
+    setPanelOpen(false);
+  }, [setMessages]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,19 +295,29 @@ export default function Chat() {
             </p>
           </div>
         </div>
-        {allAchievements.length > 0 && (
-          <button
-            onClick={() => setPanelOpen(true)}
-            className="flex items-center gap-1.5 rounded-full bg-[var(--color-teal-light)] px-3 py-1.5 transition-colors hover:bg-[var(--color-teal)]/20"
-          >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-teal)] text-[10px] text-white">
-              ✓
-            </span>
-            <span className="text-xs font-semibold text-[var(--color-teal-dark)]">
-              {uniqueCount} risultati
-            </span>
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {messages.length > 1 && (
+            <button
+              onClick={handleReset}
+              className="rounded-full px-3 py-1.5 text-xs font-medium text-[var(--color-body)] ring-1 ring-[var(--color-border)] transition-colors hover:bg-red-50 hover:text-red-600 hover:ring-red-200"
+            >
+              Ricomincia
+            </button>
+          )}
+          {allAchievements.length > 0 && (
+            <button
+              onClick={() => setPanelOpen(true)}
+              className="flex items-center gap-1.5 rounded-full bg-[var(--color-teal-light)] px-3 py-1.5 transition-colors hover:bg-[var(--color-teal)]/20"
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-teal)] text-[10px] text-white">
+                ✓
+              </span>
+              <span className="text-xs font-semibold text-[var(--color-teal-dark)]">
+                {uniqueCount} risultati
+              </span>
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Side Panel */}
