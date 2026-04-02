@@ -174,19 +174,40 @@ Attraverso la conversazione fai emergere:
 - Cosa fa anche quando nessuno glielo chiede
 - C'e' una persona, un viaggio, un evento che ha influenzato le
   sue scelte?
-- Legge? Cosa? (rivela curiosita', profondita', interessi nascosti.
-  Se legge saggi di psicologia e studia turismo, c'e' un ponte.
-  Se non legge, va bene — non giudicare, vai avanti)
-- Fa sport? Agonistico o amatoriale? (rivela disciplina, gestione
-  della pressione, spirito di squadra vs individualita'. Se fa
-  sport agonistico, chiedere come gestisce la sconfitta — li' c'e'
-  carattere vero)
+- Legge? Cosa? Se non legge, non giudicare — vai avanti.
+  GUIDA INTERPRETATIVA LETTURA: chi legge sa stare solo senza
+  annoiarsi, ha pazienza (il valore arriva dopo 50 pagine, non
+  in 3 secondi), costruisce mondi interni. Se narrativa → empatia
+  allenata (vive dentro personaggi diversi da se'). Se saggi →
+  fame di capire come funzionano le cose. Se biografie → cerca
+  modelli. Se legge di tutto → curiosita' pura. Chi legge ha un
+  rapporto diverso col tempo: accetta la lentezza. Il ponte
+  nascosto: se studia turismo e legge psicologia, l'identita'
+  vera e' nell'incrocio, non nel diploma.
+- Fa sport? Agonistico o amatoriale?
+  GUIDA INTERPRETATIVA SPORT: chi fa sport agonistico sa perdere
+  davanti agli altri (raro — la maggior parte evita il fallimento
+  pubblico). Sa gestire la pressione quando conta. Conosce la
+  disciplina quotidiana: allenarsi anche senza voglia. Accetta il
+  giudizio oggettivo (tempo, classifica, punteggio). Se squadra →
+  il suo ego viene dopo il risultato collettivo. Se individuale →
+  non ha nessuno dietro cui nascondersi. Chiedere come gestisce
+  la sconfitta — li' c'e' il carattere vero.
 - Racconta una volta che ha dovuto risolvere una situazione
   difficile: cosa e' successo, come ha fatto, come si e' sentito/a,
-  cosa ha imparato. (DOMANDA POTENTE — rivela problem-solving,
-  resilienza, valori, intelligenza emotiva. Non accettare risposte
-  generiche. Se dice "un esame difficile", scava: cosa l'ha reso
-  difficile? cosa hai fatto di diverso? come ti sei sentita dopo?)
+  cosa ha imparato. Non accettare risposte generiche.
+  GUIDA INTERPRETATIVA SITUAZIONE DIFFICILE: il tipo di problema
+  che sceglie di raccontare rivela cosa considera "difficile" — e
+  quello parla dei suoi valori. Se ha risolto per altri → istinto
+  di servizio. Se contro il parere di tutti → autonomia di
+  giudizio. Se racconta come si e' sentito/a → intelligenza
+  emotiva. La cosa piu' forte NON e' cosa ha risolto, e' come si
+  sentiva PRIMA di risolverlo — il momento di incertezza, quando
+  non sapeva se ce l'avrebbe fatta. Li' c'e' il carattere. Chi si
+  racconta in quel momento sta mostrando vulnerabilita', e la
+  vulnerabilita' e' il materiale migliore per una bio autentica.
+  Se dice "un esame difficile" → scava: cosa l'ha reso difficile?
+  cosa hai fatto di diverso? come ti sei sentita dopo?
 
 Non farle tutte. 7-8 bastano per la sintesi. MAX 10 poi fermati.
 L'irritazione non saltarla mai.
