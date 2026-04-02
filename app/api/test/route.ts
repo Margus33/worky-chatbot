@@ -1,6 +1,6 @@
 export async function GET() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  const modelId = process.env.MODEL_ID || "claude-3-5-haiku-latest";
+  const modelId = process.env.MODEL_ID || "claude-haiku-4-5-20251001";
 
   if (!apiKey) {
     return Response.json({ error: "ANTHROPIC_API_KEY not set" });

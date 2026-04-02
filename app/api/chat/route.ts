@@ -298,7 +298,7 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
 
-    const modelId = process.env.MODEL_ID || "claude-3-5-haiku-latest";
+    const modelId = process.env.MODEL_ID || "claude-haiku-4-5-20251001";
 
     const result = streamText({
       model: anthropic(modelId),
