@@ -1,41 +1,33 @@
 export async function GET() {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  const modelId = process.env.MODEL_ID || "openai/gpt-4o-mini";
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const modelId = process.env.MODEL_ID || "claude-3-5-haiku-latest";
 
-  // Test 1: check if key exists
   if (!apiKey) {
-    return Response.json({ error: "OPENROUTER_API_KEY not set" });
+    return Response.json({ error: "ANTHROPIC_API_KEY not set" });
   }
 
-  // Test 2: check key validity
   try {
-    const authRes = await fetch("https://openrouter.ai/api/v1/auth/key", {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    const authData = await authRes.json();
-
-    // Test 3: try a simple completion
-    const chatRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://worky-chatbot.vercel.app",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
       },
       body: JSON.stringify({
         model: modelId,
-        messages: [{ role: "user", content: "Rispondi solo: OK" }],
         max_tokens: 10,
+        messages: [{ role: "user", content: "Rispondi solo: OK" }],
       }),
     });
-    const chatData = await chatRes.json();
+    const data = await res.json();
 
     return Response.json({
       keyExists: true,
       keyPrefix: apiKey.substring(0, 10) + "...",
       model: modelId,
-      auth: authData,
-      chat: chatData,
+      status: res.status,
+      response: data,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown";
